@@ -1,0 +1,104 @@
+file:
+  write: no
+  dir: &DIR /Users/chao/Dataset/Twitter/ny9m/
+  raw:
+    dir: &RAW_DIR !join [*DIR, raw/]
+    tweets: !join [*RAW_DIR, tweets.txt]
+  clean:
+    dir: &CLEAN_DIR !join [*DIR, clean/]
+    tweets: !join [*CLEAN_DIR, tweets.txt]
+  input: 
+    dir: &IN_DIR !join [*DIR, input/]
+    tweets: !join [*IN_DIR, tweets.txt]
+    entities: !join [*IN_DIR, entities.txt]
+    edges: !join [*IN_DIR, entity_edges.txt]
+  output:
+    dir: &OUT_DIR !join [*DIR, output/]
+    stats: !join [*OUT_DIR, stats.txt]
+    events: !join [*OUT_DIR, events.txt]
+
+
+mongo:
+  write: no
+  dns: dmserv4.cs.illinois.edu
+  port: 11111
+  db: ny9m
+  raw_tweet_col: raw
+  clean_tweet_col: clean
+  entity_col: entities
+  exp_col: exp
+  query_col: query
+  vicinity_col: vicinity
+
+
+query:
+  generate: no
+  windowSize: [10800, 14400, 18000, 21600]
+  maxNumQueryPerWindowSize: 20
+  refWindowSize: 400000
+  minSup: 10
+  update: no
+  updateWindow: [60, 120, 300, 480, 600]
+
+
+hubseek:
+  run: no
+  bandwidth: [0.01, 0.02, 0.03, 0.04, 0.05]
+  epsilon: [0.02, 0.02, 0.03, 0.04, 0.05]
+  eta: [0.5, 0.3, 0.1, 0.7, 0.9]
+  evalBandwidth: no
+  evalEpsilon: no
+  evalEta: no
+
+
+clustream:
+  calcVicinity: no
+  pRestart: 0.2
+  errorBound: 0.01
+  numInitClusters: 100
+  numMaxClusters: 200
+  numInitTweets: 2000
+  numTweetPeriod: 2000
+  outdatedThreshold: 86400
+
+
+eventweet:
+  run: no
+  numGrid: 50
+  clusteringThre: 0.001
+
+
+wavelet:
+  run: no
+
+
+post:
+  nEvent: 10
+  nTweet: 5
+  nEntity: 10
+  # parameters for plotting event locations
+  nTweetForLoc: 50
+  startTSForLoc: 8538754
+  file:
+    topk: !join [*OUT_DIR, topk.txt]
+    json: !join [*OUT_DIR, topk.json]
+    precision_k: !join [*OUT_DIR, p_k.txt]
+    precision_time: !join [*OUT_DIR, p_time.txt]
+    time_num_tweet: !join [*OUT_DIR, time_num_tweet.txt]
+    time_clustream: !join [*OUT_DIR, time_clustream.txt]
+    time_online_num_tweet: !join [*OUT_DIR, time_online_tweet.txt]
+    time_online_num_update: !join [*OUT_DIR, time_online_update.txt]
+  draw:
+    dir: &DRAW_DIR ../../figure/exp/ny9m/
+    time_clustream: !join [*DRAW_DIR, time_clustream.pdf]
+    time_num_tweet: !join [*DRAW_DIR, time_num_tweet.pdf]
+    time_interval: !join [*DRAW_DIR, time_interval.pdf]
+    time_bandwidth: !join [*DRAW_DIR, time_bandwidth.pdf]
+    time_epsilon: !join [*DRAW_DIR, time_epsilon.pdf]
+    time_online_num_tweet: !join [*DRAW_DIR, time_online_tweet.pdf]
+    time_online_num_update: !join [*DRAW_DIR, time_online_update.pdf]
+    precision_k: !join [*DRAW_DIR, precision_k.pdf]
+    precision_time: !join [*DRAW_DIR, precision_time.pdf]
+    hubseek_location: !join [*DRAW_DIR, hubseek_loc.html]
+    eventweet_location: !join [*DRAW_DIR, eventweet_loc.html]
+    wavelet_location: !join [*DRAW_DIR, wavelet_loc.html]

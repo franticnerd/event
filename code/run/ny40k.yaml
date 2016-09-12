@@ -1,0 +1,88 @@
+file:
+  write: no
+  dir: &DIR /Users/chao/Dataset/Twitter/ny40k/
+  raw:
+    dir: &RAW_DIR !join [*DIR, raw/]
+    tweets: !join [*RAW_DIR, tweets.txt]
+  clean:
+    dir: &CLEAN_DIR !join [*DIR, clean/]
+    tweets: !join [*CLEAN_DIR, tweets.txt]
+  input:
+    dir: &IN_DIR !join [*DIR, input/]
+    tweets: !join [*IN_DIR, tweets.txt]
+    entities: !join [*IN_DIR, entities.txt]
+    edges: !join [*IN_DIR, entity_edges.txt]
+  output:
+    dir: &OUT_DIR !join [*DIR, output/]
+    stats: !join [*OUT_DIR, stats.txt]
+    events: !join [*OUT_DIR, events.txt]
+
+
+mongo:
+  write: no
+  dns: dmserv4.cs.illinois.edu
+  port: 11111
+  db: ny40k
+  raw_tweet_col: raw
+  clean_tweet_col: clean
+  entity_col: entities
+  exp_col: exp
+  query_col: query
+  vicinity_col: vicinity
+
+
+query:
+  generate: yes
+  windowSize: [3600, 10800, 21600]
+  maxNumQueryPerWindowSize: 20
+  refWindowSize: 100000
+  minSup: 10
+  K: 10
+  update: no
+  updateWindow: [60, 500, 600, 1200]
+
+
+hubseek:
+  run: no
+  bandwidth: [0.02, 0.02, 0.05]
+  epsilon: [0.01, 0.01, 0.05]
+  eta: [0.1, 0.3, 0.5, 0.7, 0.9]
+  evalBandwidth: no
+  evalEpsilon: no
+  evalEta: no
+
+
+clustream:
+  calcVicinity: no
+  pRestart: 0.2
+  errorBound: 0.01
+  numInitClusters: 100
+  numMaxClusters: 200
+  numInitTweets: 2000
+  numTweetPeriod: 2000
+  outdatedThreshold: 86400
+
+
+eventweet:
+  run: no
+  numGrid: 50
+  clusteringThre: 0.001
+
+
+wavelet:
+  run: yes
+
+post:
+  nEvent: 5
+  nTweet: 5
+  nEntity: 20
+  file:
+    topk: !join [*OUT_DIR, topk.txt]
+    dir: &DRAW_DIR ../../figure/exp/ny40k/
+    time_clustream: !join [*DRAW_DIR, time_clustream.pdf]
+    time_num_tweet: !join [*DRAW_DIR, time_num_tweet.pdf]
+    time_interval: !join [*DRAW_DIR, time_interval.pdf]
+    time_bandwidth: !join [*DRAW_DIR, time_bandwidth.pdf]
+    time_epsilon: !join [*DRAW_DIR, time_epsilon.pdf]
+    time_online_num_tweet: !join [*DRAW_DIR, time_online_tweet.pdf]
+    time_online_num_update: !join [*DRAW_DIR, time_online_update.pdf]
