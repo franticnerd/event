@@ -1,0 +1,11 @@
+input_dir: /Users/chao/Dropbox/data/raw/4sq/
+output_dir: /Users/chao/Dropbox/data/activity/4sq/input/
+
+ark_run_cmd: java -XX:ParallelGCThreads=2 -Xmx2G -jar /Users/chao/Dropbox/code/lib/ark-tweet-nlp-0.3.2.jar
+pos_types: ['N', '^', 'S', 'Z', 'M']
+
+freq_thresh: 50000
+infreq_thresh: 5
+
+test_data_ratio: 0.2
+
