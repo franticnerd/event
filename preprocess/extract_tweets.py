@@ -24,12 +24,6 @@ def find_activity_tweets(td, grid_bin_list, word_entropy_file, activity_word_fra
     cwf = ContainWordFilter(activity_words)
     td.apply_one_filter(cwf)
 
-def write_to_mongo(dns, port, db, collection, td):
-    tm = TweetMongo(dns, port, db, collection)
-    tm.remove_all_tweets()
-    tm.write_to_mongo(td)
-    print tm.num_tweets()
-
 if __name__ == '__main__':
     input_dir = '/Users/chao/Dropbox/data/raw/sample_tweets/'
     output_dir = '/Users/chao/Dropbox/data/event/sample/'

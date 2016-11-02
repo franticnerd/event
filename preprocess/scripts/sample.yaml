@@ -1,15 +1,15 @@
 input_dir: /Users/chao/Dropbox/data/raw/sample/
 clean_dir: /Users/chao/Dropbox/data/clean/sample/
+output_dir: /Users/chao/Dropbox/data/event/sample/
 
+# For cleaning the raw tweet data.
 ark_run_cmd: java -XX:ParallelGCThreads=2 -Xmx10G -jar /home/czhang82/code/lib/ark-tweet-nlp-0.3.2.jar
 pos_types: ['N', '^', 'S', 'Z']
-
 freq_thresh: 500000
 infreq_thresh: 100
-
 grid_bin_list: [50, 50, 150]
 activity_word_ratio: 0.4
 
-output_dir: /Users/chao/Dropbox/data/event/sample/
+# For formatting the clean data into the format compatible with GeoBurst
 query_lengths: [10800, 14400, 18000, 21600]
 num_query: 20
