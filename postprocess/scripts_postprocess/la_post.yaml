@@ -1,0 +1,11 @@
+clean_tweet: /shared/data/czhang82/clean/la_tweets/tweets.txt
+dir: &DIR /shared/data/czhang82/event/la_tweets/
+# inputs
+tweets: !join [*DIR, tweets.txt]
+entities: !join [*DIR, words.txt]
+edges: !join [*DIR, word_edges.txt]
+queries: !join [*DIR, queries.txt]
+# outputs
+vicinities: !join [*DIR, output_vicinities.txt]
+experiments: !join [*DIR, output_events.txt]
+
