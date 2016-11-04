@@ -33,6 +33,12 @@ public class ReferencePeriod {
     public Map<Integer, Double> getExpectedOccurrences(Set<Integer> wordIds, Location loc, double bandwidth, long timeSpan) {
         calcWeights(loc, bandwidth);
         double scalingFactor = getScalingFactor(timeSpan);
+//        System.out.println("start TS: " + startTimestamp);
+//        System.out.println("end TS: " + endTimestamp);
+//        System.out.println("time Span: " + (endTimestamp - startTimestamp));
+//        System.out.println("weights: " + weights);
+//        System.out.println("weight size: " + weights.size());
+//        System.out.println("ScalingFactor: " + scalingFactor);
         Map<Integer, Double> expectedOccurrences = new HashMap<Integer, Double>();
         for (Integer wordId : wordIds) {
             double interpolation = getEstimatedNumber(wordId);

@@ -6,7 +6,6 @@ import geo.GeoTweet;
 import geo.TweetDatabase;
 import hubseek.BatchDetector;
 import hubseek.Detector;
-import hubseek.OnlineDetector;
 import waveletdetect.WaveletDetect;
 
 import java.util.List;
@@ -17,12 +16,12 @@ public class Demo {
     static Database db;
     static Clustream clustream;
     static Map config;
-    static Mongo mongo;
+    static IOManager mongo;
 
     /** ---------------------------------- Initialize ---------------------------------- **/
     static void init(String paraFile) throws Exception {
         config = new Config().load(paraFile);
-        mongo = new Mongo(config); // init the connection to mongo db.
+        mongo = new IOManager(config); // init the connection to mongo db.
         initDatabase();  // load the data
         initClustream(); // initialize the clustream
     }
@@ -31,9 +30,9 @@ public class Demo {
     // load the initial data, and get the graph ready for computing the similarity between entities.
     static void initDatabase() throws Exception {
         // input and output files
-        String tweetFile = (String) ((Map)((Map)config.get("file")).get("input")).get("tweets");
-        String entityFile = (String) ((Map)((Map)config.get("file")).get("input")).get("entities");
-        String entityEdgeFile = (String) ((Map)((Map)config.get("file")).get("input")).get("edges");
+        String tweetFile = (String) (((Map)config.get("file")).get("tweets"));
+        String entityFile = (String) (((Map)config.get("file")).get("entities"));
+        String entityEdgeFile = (String) (((Map)config.get("file")).get("edges"));
         double epsilon = ((List<Double>) ((Map)config.get("hubseek")).get("epsilon")).get(0);
         int numInitTweets = (Integer) ((Map)config.get("clustream")).get("numInitTweets");
         double pRestart = (Double) ((Map)config.get("clustream")).get("pRestart");
@@ -44,15 +43,11 @@ public class Demo {
         db.loadEntityGraph(entityFile, entityEdgeFile);
         if ((Boolean) ((Map)config.get("clustream")).get("calcVicinity")) {
             db.getEntityGraph().calcVicinity(epsilon, errorBound, pRestart);
-            mongo.dropVicinity();
             mongo.writeVicinity(db.getEntityGraph());
         } else {
             mongo.loadVicinity(db.getEntityGraph());
         }
         db.getEntityGraph().printStats();
-        // init mongo db collections
-        if ((Boolean) ((Map)config.get("mongo")).get("write") == true)
-            mongo.dropExp();
     }
 
     // initialize clustream and the entity graph
@@ -80,8 +75,8 @@ public class Demo {
             addTweet(query, queryDB, refDB, tweet);
             clustream.update(tweet);
             if (tweet.getTimestamp() > query.getEndTS()) {
+                System.out.println("Query: " + queryIndex + " startTS: " + query.getStartTS() + " endTS: " + query.getEndTS());
                 trigger(query, queryDB, refDB);
-//                System.exit(1);
                 queryIndex ++;
                 if (queryIndex < queries.size()) {
                     query = queries.get(queryIndex);
@@ -128,30 +123,29 @@ public class Demo {
             System.out.println("Starting Hubseek");
             detector.detect(queryDB, query.getQueryInterval(), bandwidth, epsilon, minSup, refTimeSpan, eta);
             detector.printStats();
+            detector.printEvents();
         }
         return detector;
     }
 
     // evaluate eventweet.
     static EvenTweet runEvenTweet(TweetDatabase queryDB, TweetDatabase refDB) {
+        if (!(Boolean) ((Map)config.get("eventweet")).get("run"))   return null;
+        System.out.println("Starting eventweet");
         int numGrid = (Integer) ((Map)config.get("eventweet")).get("numGrid");
         double clusteringThreshold = (Double) ((Map)config.get("eventweet")).get("clusteringThre");
         double entropyThreshold = Math.log(numGrid * numGrid / 4.0);
         EvenTweet evenTweet= new EvenTweet(numGrid, clusteringThreshold, entropyThreshold);
-        if ((Boolean) ((Map)config.get("eventweet")).get("run")) {
-            System.out.println("Starting eventweet");
-            evenTweet.detect(refDB, queryDB);
-        }
+        evenTweet.detect(refDB, queryDB);
         return evenTweet;
     }
 
     // evaluate wavelet.
     static WaveletDetect runWavelet(TweetDatabase queryDB, TweetDatabase refDB) {
+        if (!(Boolean) ((Map)config.get("wavelet")).get("run"))     return null;
+        System.out.println("Starting wavelet");
         WaveletDetect waveletDetect = new WaveletDetect();
-        if ((Boolean) ((Map)config.get("wavelet")).get("run")) {
-            System.out.println("Starting wavelet");
-            waveletDetect.detectionMain(refDB);
-        }
+        waveletDetect.detectionMain(refDB);
         return waveletDetect;
     }
 
@@ -212,43 +206,15 @@ public class Demo {
 
 
     static void writeResults(Detector hubseek, EvenTweet evenTweet, WaveletDetect wavelet) throws Exception {
-        if( (Boolean) ((Map)config.get("mongo")).get("write") ) {
-            mongo.writeExp(hubseek, evenTweet, wavelet);
-        }
+        mongo.writeExp(hubseek, evenTweet, wavelet);
     }
 
-    /** ---------------------------------- run online ---------------------------------- **/
-    static void runOnline() throws Exception {
-        if ((Boolean) ((Map)config.get("hubseek")).get("run") == false || ((Boolean) ((Map)config.get("query")).get("update") == false ))
-            return;
-        List<OnlineQuery> queries = mongo.loadOnlineQueries(config, mongo);
-        System.out.println("number of online queries:" + queries.size());
-        for (OnlineQuery query : queries) {
-            // skip the empty databases
-            if (query.getBatchTD().size() == 0 || query.getBatchTD().size() + query.getInsertTD().size() - query.getDeleteTD().size() <= 0)
-                continue;
-            // parameters for hubseek
-            double bandwidth = ((List<Double>) ((Map)config.get("hubseek")).get("bandwidth")).get(0);
-            double epsilon = ((List<Double>) ((Map)config.get("hubseek")).get("epsilon")).get(0);
-            double eta = ((List<Double>) ((Map)config.get("hubseek")).get("eta")).get(0);
-            long refTimeSpan = query.getRefEndTS() - query.getRefStartTS();
-            int minSup = query.getMinSup();
-            // run online query
-            Detector detector = new OnlineDetector(clustream, db.getEntityGraph());
-            detector.detect(query.getBatchTD(), query.getQueryInterval(), bandwidth, epsilon, minSup, refTimeSpan, eta);
-            detector.update(query.getDeleteTD(), query.getInsertTD(), bandwidth, minSup, refTimeSpan, eta);
-            detector.printStats();
-            writeResults(detector, null, null);
-        }
-        System.out.println("running online mode done.");
-    }
 
     /** ---------------------------------- main ---------------------------------- **/
     public static void main(String [] args) throws Exception {
-        String paraFile = args.length > 0 ? args[0] : "../run/ny9m.yaml";
+        String paraFile = args.length > 0 ? args[0] : "../run/sample.yaml";
         init(paraFile);
         runBatch();
-        runOnline();
     }
 
 }

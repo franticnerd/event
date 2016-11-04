@@ -2,8 +2,10 @@ package hubseek;
 
 import com.mongodb.BasicDBObject;
 import geo.GeoTweet;
+import graph.Graph;
 
 import java.util.*;
+
 
 /**
  * Created by chao on 6/20/15.
@@ -18,6 +20,9 @@ public class TweetCluster {
     Map<Integer, Double> tfIdf = new HashMap<Integer, Double>(); // key: entity id; value: tf-idf
     // the score of this cluster
     double score = 0;
+    // the background word tf-idf distribution at this location, computed from clustream
+    Map<Integer, Double> backgroundTfidf = new HashMap<Integer, Double>(); // key: entity id; value: tf-idf
+
 
     public TweetCluster(GeoTweet center) {
         this.center = center;
@@ -89,6 +94,10 @@ public class TweetCluster {
         tfIdf.put(entityId, val);
     }
 
+    // get a map that store the number of occurrences for different entities
+    public void setBackgroundDistribution(Map<Integer, Double> backgroundTfidf) {
+        this.backgroundTfidf = backgroundTfidf;
+    }
 
     @Override
     public String toString() {
@@ -102,6 +111,16 @@ public class TweetCluster {
     }
 
 
+    public String toString(Graph entityGraph) {
+        String s = "# Cluster Score:" + score + "\n";
+        s += "Num of Tweets:" + this.members.size() + "\n";
+        s += "Center Tweet ID:" + this.center.getTweetId() + "\n";
+        for (GeoTweet e : members) {
+            s += "\t" + e.toString(entityGraph) + "\n";
+        }
+        return s;
+    }
+
     public BasicDBObject toBSon() {
         // members
         List<Long> tweetIds = new ArrayList<Long>();
@@ -114,13 +133,19 @@ public class TweetCluster {
             double tfIdfVal = tfIdf.get(entityId);
             entities.append(entityId.toString(), tfIdfVal);
         }
+        BasicDBObject backgroundEntities = new BasicDBObject();
+        for (Integer entityId : backgroundTfidf.keySet()) {
+            double tfIdfVal = backgroundTfidf.get(entityId);
+            backgroundEntities.append(entityId.toString(), tfIdfVal);
+        }
         return new BasicDBObject()
                 .append("score", score)
                 .append("center", center.getTweetId())
                 .append("size", tweetIds.size())
                 .append("members", tweetIds)
                 .append("authority", authority)
-                .append("entityTfIdf", entities);
+                .append("entityTfIdf", entities)
+                .append("backgroundTfIdf", backgroundEntities);
     }
 
 }

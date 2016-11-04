@@ -1,9 +1,5 @@
 package geo;
 
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.MongoClient;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.*;

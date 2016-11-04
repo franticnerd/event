@@ -31,6 +31,17 @@ public class Ranker {
         this.eta = eta;
     }
 
+    // generate background distribution for each cluster based on the knowledge in CluStream
+    public void genBackgroundDistribution(List<TweetCluster> clusters, long startTimestamp, long endTimestamp, long refTimespan) {
+        // init the reference periods
+        Snapshot snap = clustream.getPyramid().getSnapshotJustBefore(startTimestamp);
+        // init the probability distribution for each cluster
+        for (TweetCluster gec : clusters) {
+            // get the historical background entity distribution at the current cluster center.
+            Map<Integer, Double> background = snap.genEntityTfIdfDistribution(gec.getCenter().getLocation());
+            gec.setBackgroundDistribution(background);
+        }
+    }
 
     public List<ScoreCell> rank(List<TweetCluster> clusters, double bandwidth, long startTimestamp, long endTimestamp, long refTimespan) {
         long start = System.currentTimeMillis();
@@ -60,6 +71,8 @@ public class Ranker {
         timeRanking = (end - start) / 1000.0;
         return scorecells;
     }
+
+
 
     // fetech from clustream the list of reference periods and the clusters falling inside each reference period
     private void initReferencePeriods(long startTimestamp, long refTimespan) {
@@ -141,6 +154,10 @@ public class Ranker {
                 double sigma = Utils.std(referenceCounts);
                 double zscore = (sigma == 0 ? 0 : (cnt - mu) / sigma);
                 zscores.put(entityId, zscore);
+//                System.out.println("Cnt: " + cnt);
+//                System.out.println("Mu: " + mu);
+//                System.out.println("Sigma: " + sigma);
+//                System.out.println("Zscore: " + zscore);
             }
         }
         return zscores;
@@ -166,6 +183,10 @@ public class Ranker {
                 double sigma = Utils.std(refProbs);
                 double zscore = (sigma == 0 ? 0 : (prob - mu) / sigma);
                 zscores.put(entityId, zscore);
+//                System.out.println(allCandidates.size());
+//                System.out.println(mu);
+//                System.out.println(sigma);
+//                System.out.println(zscore);
             }
         }
         return zscores;

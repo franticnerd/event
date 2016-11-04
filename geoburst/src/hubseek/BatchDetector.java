@@ -58,6 +58,8 @@ public class BatchDetector extends Detector {
 
     // rank the clusters with the background knowledge in clustream.
     protected List<TweetCluster> rank(List<TweetCluster> clusters, double bandwidth, long refTimeSpan) {
+        // get the background word distribution for each cluster
+        ranker.genBackgroundDistribution(clusters, td.getStartTimestamp(), td.getEndTimestamp(), refTimeSpan);
         // get the ranking list for the clusters
         List<ScoreCell> scoreCells = ranker.rank(clusters, bandwidth, td.getStartTimestamp(), td.getEndTimestamp(), refTimeSpan);
         // organize the clusters into a ranked order.

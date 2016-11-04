@@ -1,16 +1,15 @@
 package clustream;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import geo.Location;
+
+import java.util.*;
 
 public class Snapshot {
 
 	int order;
 	long timeFrameId;
 	long timestamp;
-	Map<Integer, MicroCluster> clusters;
+	Map<Integer, MicroCluster> clusters; //key: clusterId; value: cluster
 	
 	public Snapshot(int order, long timeFrameId, long timestamp, Map<Integer, MicroCluster> clusters) {
 		this.order = order;
@@ -72,6 +71,75 @@ public class Snapshot {
 		}
 		return diffSet;
 	}
+
+
+	// get the language model at a specific location, done by retrieving the nearest cluster and compute the tf-idf dist.
+	public Map<Integer, Double> genEntityTfIdfDistribution(Location loc) {
+		MicroCluster nearestCluster = getNearestMicroCluster(loc);
+//		System.out.println("query location:" + loc.toString());
+//		System.out.println("nearest cluster:" + nearestCluster.getCentroidLocation().toString());
+		Map<Integer, Double> tfDist = nearestCluster.getEntityTFDistribution();
+//		System.out.println("tf distribution:" + tfDist);
+		Map<Integer, Double> idfDist = getEntityIdfDistribution(nearestCluster);
+//		System.out.println("idf distribution:" + idfDist);
+		return multiplyTfIdfDist(tfDist, idfDist);
+	}
+
+	private MicroCluster getNearestMicroCluster(Location loc) {
+		double smallestDist = Double.MAX_VALUE;
+		int retClusterId = -1;
+		for (Map.Entry<Integer, MicroCluster> e : this.clusters.entrySet()) {
+            int clusterId = e.getKey();
+			Location current = e.getValue().getCentroidLocation();
+			double dist = loc.calcEuclideanDist(current);
+			if (dist < smallestDist) {
+				smallestDist = dist;
+				retClusterId = clusterId;
+			}
+		}
+//		System.out.println("Smallest distance: " + smallestDist);
+		return clusters.get(retClusterId);
+	}
+
+	private Map<Integer, Double> getEntityIdfDistribution(MicroCluster nearestCluster) {
+		int N = clusters.size(); 	// total number of clusters
+		Map<Integer, Double> idfs = new HashMap<Integer, Double>();
+		Set<Integer> targetEntityIds = nearestCluster.getEntityIds();
+		for (Integer entityId : targetEntityIds) {
+			int rawIdf = 0;
+			for (MicroCluster c : clusters.values()) {
+                if (c.containsEntity(entityId))
+                	rawIdf ++;
+            }
+            idfs.put(entityId, (double) rawIdf);
+		}
+        for (Integer entityId : idfs.keySet()) {
+            double n = idfs.get(entityId);
+            double idf = Math.log((N - n + 0.5) / (n + 0.5));
+            idfs.put(entityId, idf);
+        }
+		return idfs;
+	}
+
+	// multiply tf and idf; then normalize
+	private Map<Integer, Double> multiplyTfIdfDist(Map<Integer, Double> tfDist, Map<Integer, Double> idfDist) {
+		Map<Integer, Double> tfIdfDist = new HashMap<Integer, Double>();
+		double totalWeight = 0; // used for normalization
+        for (Map.Entry<Integer, Double> e : tfDist.entrySet()) {
+			int entityId = e.getKey();
+			double tf = e.getValue();
+			double idf = idfDist.get(entityId);
+			tfIdfDist.put(entityId, tf * idf);
+			totalWeight += tf * idf;
+		}
+		for (Map.Entry<Integer, Double> e : tfIdfDist.entrySet()) {
+			int entityId = e.getKey();
+			double tfIdf = e.getValue() / totalWeight;
+			tfIdfDist.put(entityId, tfIdf);
+		}
+		return tfIdfDist;
+	}
+
 
 	@Override
 	public String toString() {

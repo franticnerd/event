@@ -27,7 +27,7 @@ public class Propagator {
 			propagationScore[nodeId] = 0;
 			iter ++;
 			if (iter >= 2000) {
-				System.out.println(iter);
+				System.out.println("Max iteration reached for RWR.");
 				break;
 			}
 		}

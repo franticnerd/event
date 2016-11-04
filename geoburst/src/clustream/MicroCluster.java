@@ -1,6 +1,7 @@
 package clustream;
 
 import geo.GeoTweet;
+import geo.Location;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealVector;
 
@@ -82,6 +83,11 @@ public class MicroCluster {
 		return words;
 	}
 
+
+    public Location getCentroidLocation() {
+        return new Location(this.getCentroid());
+    }
+
     public double getFreshness(double quantile) {
         double muTime = ts1 / num;
         // If there are too few tweets.
@@ -151,6 +157,25 @@ public class MicroCluster {
         }
     }
 
+
+    public Map<Integer, Double> getEntityTFDistribution() {
+        Map<Integer, Double> tfDist = new HashMap<Integer, Double>();
+        for (Map.Entry<Integer, Integer> e : words.entrySet()) {
+            int entityId = e.getKey();
+            int cnt = e.getValue();
+            double tf = Math.log(1.0 + cnt);
+            tfDist.put(entityId, tf);
+        }
+        return tfDist;
+    }
+
+    public Set<Integer> getEntityIds() {
+        return this.words.keySet();
+    }
+
+    public boolean containsEntity(int entityId) {
+        return words.containsKey(entityId);
+    }
 
     @Override
 	public String toString() {

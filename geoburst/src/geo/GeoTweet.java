@@ -100,4 +100,12 @@ public class GeoTweet {
         return loc.toString() + "," + entityIds;
     }
 
+    public String toString(Graph entityGraph) {
+        String ret = loc.toString();
+        for (int i : entityIds) {
+            ret += " " + entityGraph.getNode(i).getDescription();
+
+        }
+        return ret;
+    }
 }

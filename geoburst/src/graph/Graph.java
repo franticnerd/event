@@ -204,9 +204,7 @@ public class Graph {
 	// compute the rwr scores for all the nodes.
 	// epsilon: the rwr threshold; error bound: the rwr error; c: the restart probability
 	public void calcVicinity(double epsilon, double errorBound, double c) {
-//		Squeeze searcher = new Squeeze(this);
         Propagator searcher = new Propagator(this);
-//        Ripple searcher = new Ripple(this);
 		int cnt = 0;
         long start = System.currentTimeMillis();
 		for (Node n : mNodes) {
@@ -215,6 +213,12 @@ public class Graph {
 			cnt ++;
 			if (cnt % 100 == 0) {
                 System.out.println("Finished computing vicinity for " + cnt + " nodes.");
+				// Print the neighbor info for debuging
+				System.out.println(n.getId() + "\t" +  n.getDescription());
+				for (Map.Entry<Integer, Double> e : neighbors.entrySet()) {
+					int neighborId = e.getKey();
+					System.out.println("\t" + e.getKey() + "\t" + mNodes.get(neighborId).getDescription() + "\t" + e.getValue() );
+				}
 //                break;
             }
 		}

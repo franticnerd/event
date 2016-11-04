@@ -22,6 +22,16 @@ public class Location implements Serializable {
     this.lat = lat;
   }
 
+
+  public Location(RealVector v) {
+    if (v.getDimension() != 2) {
+      System.out.println("Error when creating location from a real vector");
+      return;
+    }
+    this.lng = v.getEntry(0);
+    this.lat = v.getEntry(1);
+  }
+
   public Location(List<Double> coordinates) {
     if (coordinates.size() != 2) {
       System.out.println("Warning! The size of the coordiantes is not 2!");

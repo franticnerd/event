@@ -84,6 +84,12 @@ public abstract class Detector {
         ranker.printStats();
     }
 
+    public void printEvents() {
+        for(TweetCluster gec : events) {
+            System.out.println(gec.toString(graph));
+        }
+    }
+
     public void writeEvents(String clusterFile) throws IOException {
         BufferedWriter bw = new BufferedWriter(new FileWriter(clusterFile, true));
         for(TweetCluster gec : events) {
@@ -128,5 +134,6 @@ public abstract class Detector {
         }
         return ret;
     }
+
 
 }

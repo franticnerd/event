@@ -42,7 +42,7 @@ public class IDFWeighter {
         }
     }
 
-    // build the tfs with the tweets in the current cluster.
+    // build the tf-idfs with the tweets in the current cluster.
     public void buildTFIDF(TweetCluster cluster) {
         weights = new HashMap<Integer, Double>(); // key: entity Id, value: tf-idf
         // calc tf-idf
