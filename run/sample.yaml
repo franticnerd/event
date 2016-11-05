@@ -35,8 +35,8 @@ clustream:
   numInitClusters: 1000
   numMaxClusters: 2000
   numInitTweets: 10000
-  numTweetPeriod: 200000
-  outdatedThreshold: 3000000
+  numTweetPeriod: 2000
+  outdatedThreshold: 30
 
 eventweet:
   run: no

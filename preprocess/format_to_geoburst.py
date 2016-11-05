@@ -11,6 +11,12 @@ def load_tweet_db(input_tweet_file):
     td.load_clean_tweets_from_file(input_tweet_file)
     return td
 
+def dump_text(td, tweet_message_file):
+    with open(tweet_message_file, 'w') as fout:
+        for tweet in td.tweets:
+            words = tweet.message.words
+            fout.write(' '.join(words) + '\n')
+
 
 # calc word co-occurrence info and write to file
 def build_word_edges(td, wd, word_edge_file):
@@ -52,7 +58,7 @@ def gen_queries(td, num_query, query_lengths, ref_window_size, query_file):
     random.seed(100)
     min_ts, max_ts = td.calc_time_range()
     day_pool = get_day_pool(min_ts, max_ts, ref_window_size)
-    print day_pool
+    # print day_pool
     queries = []
     for l in query_lengths:
         for i in xrange(num_query):
@@ -91,13 +97,14 @@ def gen_one_query(day_pool, current_size):
     return (query_start, query_end)
 
 
-def run(input_tweet_file, word_dict_file, word_edge_file, clean_tweet_file, \
+def run(input_tweet_file, tweet_message_file, word_dict_file, word_edge_file, clean_tweet_file, \
         query_file, num_query, query_lengths, ref_window_size):
     td = load_tweet_db(input_tweet_file)
     wd = td.gen_word_dict(word_dict_file)
-    build_word_edges(td, wd, word_edge_file)
-    format_tweets(td, wd, clean_tweet_file)
-    gen_queries(td, num_query, query_lengths, ref_window_size, query_file)
+    dump_text(td, tweet_message_file)
+    # build_word_edges(td, wd, word_edge_file)
+    # format_tweets(td, wd, clean_tweet_file)
+    # gen_queries(td, num_query, query_lengths, ref_window_size, query_file)
 
 
 if __name__ == '__main__':
@@ -117,10 +124,11 @@ if __name__ == '__main__':
         ref_window_size = para['refWindowSize']
 
     input_tweet_file = input_dir + 'tweets.txt'
+    tweet_message_file = output_dir + 'messages.txt'
     word_dict_file = output_dir + 'words.txt'
     word_edge_file = output_dir + 'word_edges.txt'
     clean_tweet_file = output_dir + 'tweets.txt'
     query_file = output_dir + 'queries.txt'
 
-    run(input_tweet_file, word_dict_file, word_edge_file, clean_tweet_file, \
+    run(input_tweet_file, tweet_message_file, word_dict_file, word_edge_file, clean_tweet_file, \
         query_file, num_query, query_lengths, ref_window_size)

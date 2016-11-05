@@ -74,6 +74,19 @@ public class Clustream {
             clusters.put(toAssignClusterId, cluster);
             toAssignClusterId ++;
         }
+//        for (Map.Entry<Integer, MicroCluster> e : clusters.entrySet()) {
+//            if (e.getValue().size() == 0) {
+//                System.out.println(e.getKey());
+//                System.out.println("size: " + e.getValue().size());
+//            }
+//        }
+        // remove the zero-size clusters
+        for(Iterator<Map.Entry<Integer, MicroCluster>> it = clusters.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<Integer, MicroCluster> entry = it.next();
+            if(entry.getValue().size() == 0) {
+                it.remove();
+            }
+        }
     }
 
     /***************************  Clustering ****************************/
