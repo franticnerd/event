@@ -1,5 +1,5 @@
 file:
-  dir: &DIR /Users/chao/Dropbox/data/event/ny_tweets/
+  dir: &DIR /shared/data/czhang82/event/ny_tweets/
   # inputs
   tweets: !join [*DIR, tweets.txt]
   entities: !join [*DIR, words.txt]
@@ -29,14 +29,14 @@ hubseek:
 
 
 clustream:
-  calcVicinity: yes
+  calcVicinity: no
   pRestart: 0.2
   errorBound: 0.005
-  numInitClusters: 1000
-  numMaxClusters: 2000
+  numInitClusters: 400
+  numMaxClusters: 800
   numInitTweets: 10000
   numTweetPeriod: 200000
-  outdatedThreshold: 3000000
+  outdatedThreshold: 864000
 
 eventweet:
   run: no
