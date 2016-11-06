@@ -33,7 +33,7 @@ clustream:
   pRestart: 0.2
   errorBound: 0.005
   numInitClusters: 400
-  numMaxClusters: 800
+  numMaxClusters: 500
   numInitTweets: 10000
   numTweetPeriod: 200000
   outdatedThreshold: 864000

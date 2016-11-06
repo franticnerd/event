@@ -13,16 +13,15 @@ class LabeledLineSentence(object):
 
 def run(message_file, embedding_file):
     sentences = LabeledLineSentence(message_file)
-    model = Doc2Vec(alpha=0.025, size=100, window=8, min_alpha=0.025, workers=2)  # use fixed learning rate
+    model = Doc2Vec(alpha=0.025, size=100, window=15, min_alpha=0.025, workers=15)  # use fixed learning rate
     model.build_vocab(sentences)
     for epoch in range(10):
         print epoch
         model.train(sentences)
         model.alpha -= 0.002  # decrease the learning rate
         model.min_alpha = model.alpha  # fix the learning rate, no decay
-    print model.most_similar('garden')
+    print model.most_similar('basketball')
     model.save(embedding_file)
-
 
 if __name__ == '__main__':
     data_dir = '/Users/chao/Dropbox/data/event/sample/'
