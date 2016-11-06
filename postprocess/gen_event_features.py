@@ -7,6 +7,8 @@ import numpy.linalg as npla
 from zutils.datasets.twitter.tweet_database import TweetDatabase
 from zutils.dto.text.word_dict import WordDict
 from zutils.config.param_handler import yaml_loader
+from gensim.models.doc2vec import Doc2Vec
+from scipy.spatial.distance import cosine
 
 
 def load_tweet_database(input_tweet_file):
@@ -35,9 +37,10 @@ def load_raw_exp_results(exp_file):
 '''
 Module I. generate the features for each event;
 '''
-def gen_event_features(td, wd, events, event_feature_file):
+def gen_event_features(td, wd, events, embedding_file, event_feature_file):
     features = []
     overall_language_model = gen_overall_distribution(wd, events)
+    embedding_model = load_embedding_model(embedding_file)
     for event_id, event in enumerate(events):
         feature = []
         feature.append(get_z_score(event))
@@ -47,8 +50,8 @@ def gen_event_features(td, wd, events, event_feature_file):
         feature.extend(get_spatial_variance(td, event))
         feature.append(get_spatial_tf_idf_cosine(wd, event))
         feature.append(get_temporal_tf_idf_cosine(wd, event, overall_language_model))
-        feature.append(get_spatial_embedding_cosine(event))
-        feature.append(get_temporal_embedding_cosine(event))
+        feature.append(get_spatial_embedding_cosine(wd, event, embedding_model))
+        feature.append(get_temporal_embedding_cosine(wd, event, overall_language_model, embedding_model))
         features.append(feature)
     with open(event_feature_file, 'w') as fout:
         fout.write('\t'.join(['burstiness',
@@ -131,7 +134,7 @@ def get_spatial_tf_idf_cosine(wd, event):
     dim = wd.size()
     event_vector = to_vector(dim, event['entityTfIdf'])
     background_vector = to_vector(dim, event['backgroundTfIdf'])
-    print 'Norms: ', npla.norm(event_vector, 1), npla.norm(background_vector, 1)
+    # print 'Norms: ', npla.norm(event_vector, 1), npla.norm(background_vector, 1)
     return np.dot(event_vector, background_vector)
 
 
@@ -141,12 +144,47 @@ def get_temporal_tf_idf_cosine(wd, event, overall_language_model):
     return np.dot(event_vector, overall_language_model)
 
 
-def get_spatial_embedding_cosine(event):
-    return 0
+def get_spatial_embedding_cosine(wd, event, embedding_model):
+    dim = wd.size()
+    event_distribution = to_vector(dim, event['entityTfIdf'])
+    background_distribution = to_vector(dim, event['backgroundTfIdf'])
+    event_words = get_top_words_from_distribution(event_distribution, wd)
+    background_words = get_top_words_from_distribution(background_distribution, wd)
+    event_embedding = embedding_model.infer_vector(event_words)
+    background_embedding = embedding_model.infer_vector(background_words)
+    print 'Representative words for event and background activities.'
+    print '\t', event_words
+    print '\t', background_words
+    print '\t', 1.0 - cosine(event_embedding, background_embedding)
+    return 1.0 - cosine(event_embedding, background_embedding)
 
-def get_temporal_embedding_cosine(event):
-    return 0
 
+def load_embedding_model(embedding_file):
+    model = Doc2Vec.load(embedding_file)
+    return model
+
+# get the top N words from a given distribution
+def get_top_words_from_distribution(distribution, wd, num = 10):
+    sort_list = []
+    for i, value in enumerate(distribution):
+        sort_list.append((i, value))
+    sort_list.sort( key = operator.itemgetter(1), reverse = True )
+    word_ids = [e[0] for e in sort_list[:num]]
+    return [wd.get_word(word_id) for word_id in word_ids]
+
+
+def get_temporal_embedding_cosine(wd, event, overall_language_model, embedding_model):
+    dim = wd.size()
+    event_distribution = to_vector(dim, event['entityTfIdf'])
+    event_words = get_top_words_from_distribution(event_distribution, wd)
+    background_words = get_top_words_from_distribution(overall_language_model, wd)
+    event_embedding = embedding_model.infer_vector(event_words)
+    background_embedding = embedding_model.infer_vector(background_words)
+    print 'Representative words for event and temporal activities.'
+    print '\t', event_words
+    print '\t', background_words
+    print '\t', 1.0 - cosine(event_embedding, background_embedding)
+    return 1.0 - cosine(event_embedding, background_embedding)
 
 '''
 Module II. generate the description of each event.
@@ -196,12 +234,12 @@ def get_top_words(event, wd, num=10):
         words.append(word)
     return {'words': ','.join(words)}
 
-def run(input_tweet_file, word_dict_file, exp_file, feature_file, description_file):
+def run(input_tweet_file, word_dict_file, exp_file, embedding_file, feature_file, description_file):
     td = load_tweet_database(input_tweet_file)
     td.index()
     wd = load_word_dict(word_dict_file)
     events = load_raw_exp_results(exp_file)
-    gen_event_features(td, wd, events, feature_file)
+    gen_event_features(td, wd, events, embedding_file, feature_file)
     gen_event_descriptions(td, wd, events, description_file)
 
 
@@ -213,10 +251,10 @@ if __name__ == '__main__':
         para = yaml_loader().load(para_file)
         input_tweet_file = para['clean_tweet']
         data_dir = para['dir']
-
     word_dict_file = data_dir + 'words.txt'
     exp_file = data_dir + 'output_events.txt'
+    embedding_file = data_dir + 'embeddings.txt'
     feature_file = data_dir + 'classify_event_features.txt'
     description_file = data_dir + 'classify_event_descriptions.txt'
-    run(input_tweet_file, word_dict_file, exp_file, feature_file, description_file)
+    run(input_tweet_file, word_dict_file, exp_file, embedding_file, feature_file, description_file)
 
