@@ -1,4 +1,5 @@
 clean_tweet: /shared/data/czhang82/clean/la_tweets/tweets.txt
+embedding: /shared/data/dlei5/event-git/doc2vec/mymodel
 dir: &DIR /shared/data/czhang82/event/la_tweets/
 plot_dir: /Users/chao/Dropbox/Research/event/results/la/
 # inputs

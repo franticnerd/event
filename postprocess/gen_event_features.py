@@ -45,26 +45,33 @@ def gen_event_features(td, wd, events, embedding_file, event_feature_file):
         feature = []
         feature.append(get_z_score(event))
         feature.append(get_num_tweets(event))
-        feature.extend(get_day_hour(td, event))
+        # feature.extend(get_day_hour(td, event))
         feature.append(get_temporal_variance(td, event))
         feature.extend(get_spatial_variance(td, event))
         feature.append(get_spatial_tf_idf_cosine(wd, event))
         feature.append(get_temporal_tf_idf_cosine(wd, event, overall_language_model))
-        feature.append(get_spatial_embedding_cosine(wd, event, embedding_model))
-        feature.append(get_temporal_embedding_cosine(wd, event, overall_language_model, embedding_model))
+        # feature.append(get_spatial_embedding_cosine(wd, event, embedding_model))
+        # feature.append(get_temporal_embedding_cosine(wd, event, overall_language_model, embedding_model))
         features.append(feature)
     with open(event_feature_file, 'w') as fout:
+        # fout.write('\t'.join(['burstiness',
+        #                       'n_tweet',
+        #                       'is_weekend',
+        #                       'hour',
+        #                       'time_std',
+        #                       'lat_std',
+        #                       'lng_std',
+        #                       'spatial_tfidf_cos',
+        #                       'temporal_tfidf_cos',
+        #                       'spatial_embed_cos',
+        #                       'temporal_embed_cos']) + '\n')
         fout.write('\t'.join(['burstiness',
                               'n_tweet',
-                              'is_weekend',
-                              'hour',
                               'time_std',
                               'lat_std',
                               'lng_std',
                               'spatial_tfidf_cos',
-                              'temporal_tfidf_cos',
-                              'spatial_embed_cos',
-                              'temporal_embed_cos']) + '\n')
+                              'temporal_tfidf_cos']) + '\n')
         for feature in features:
             fout.write('\t'.join([str(e) for e in feature]) + '\n')
 
@@ -152,15 +159,19 @@ def get_spatial_embedding_cosine(wd, event, embedding_model):
     background_words = get_top_words_from_distribution(background_distribution, wd)
     event_embedding = embedding_model.infer_vector(event_words)
     background_embedding = embedding_model.infer_vector(background_words)
-    print 'Representative words for event and background activities.'
-    print '\t', event_words
-    print '\t', background_words
-    print '\t', 1.0 - cosine(event_embedding, background_embedding)
+    # print 'Representative words for event and background activities.'
+    # print '\t', event_words
+    # print '\t', background_words
+    # print '\t', 1.0 - cosine(event_embedding, background_embedding)
     return 1.0 - cosine(event_embedding, background_embedding)
 
 
 def load_embedding_model(embedding_file):
     model = Doc2Vec.load(embedding_file)
+    # to make gensim load word2vec models
+    # model = Doc2Vec.load_word2vec_format(embedding_file, binary=False)
+    # model.hs = 0
+    # model.syn0_lockf = np.zeros(len(model.syn0), dtype=np.float32)
     return model
 
 # get the top N words from a given distribution
@@ -240,20 +251,22 @@ def run(input_tweet_file, word_dict_file, exp_file, embedding_file, feature_file
     wd = load_word_dict(word_dict_file)
     events = load_raw_exp_results(exp_file)
     gen_event_features(td, wd, events, embedding_file, feature_file)
-    gen_event_descriptions(td, wd, events, description_file)
+    # gen_event_descriptions(td, wd, events, description_file)
 
 
 if __name__ == '__main__':
     input_tweet_file = '/Users/chao/Dropbox/data/clean/sample/tweets.txt'
     data_dir = '/Users/chao/Dropbox/data/event/sample/'
+    embedding_file = '/Users/chao/Dropbox/data/event/sample/embeddings.txt'
     if len(sys.argv) > 1:
         para_file = sys.argv[1]
         para = yaml_loader().load(para_file)
         input_tweet_file = para['clean_tweet']
+        embedding_file = para['embedding']
         data_dir = para['dir']
     word_dict_file = data_dir + 'words.txt'
-    exp_file = data_dir + 'output_events.txt'
     embedding_file = data_dir + 'embeddings.txt'
+    exp_file = data_dir + 'output_events.txt'
     feature_file = data_dir + 'classify_event_features.txt'
     description_file = data_dir + 'classify_event_descriptions.txt'
     run(input_tweet_file, word_dict_file, exp_file, embedding_file, feature_file, description_file)

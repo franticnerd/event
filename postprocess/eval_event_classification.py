@@ -1,7 +1,7 @@
 import operator
 import sys
 import pandas as pd
-
+from sklearn.feature_selection import RFE
 from sklearn import metrics
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
@@ -12,6 +12,8 @@ from numpy.random import permutation
 import random
 import numpy as np
 from sklearn.metrics import precision_recall_fscore_support
+from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import chi2
 
 
 def load_train_test(feature_file, label_file):
@@ -80,7 +82,19 @@ def subsample(f_train, y_train):
 
 def train(features, labels):
     model = LogisticRegression()
+    # model.fit(features, labels)
+    # print feature importance
+    # rfe = RFE(model, 1)
+    # fit = rfe.fit(features, labels)
+    # # print("Num Features: %d") % fit.n_features_
+    # # print("Selected Features: %s") % fit.support_
+    # print("Feature Ranking: %s") % fit.ranking_
+
+    # Random Forest Classifier
     # model = RandomForestClassifier()
+    # model.fit(features, labels)
+    # print model.feature_importances_
+
     model.fit(features, labels)
     return model
 
@@ -127,4 +141,5 @@ if __name__ == '__main__':
     precision, recall, fscore = np.mean(precisions), np.mean(recalls), np.mean(fscores)
     print precision, recall, fscore
     with open(performance_file, 'w') as fout:
-        fout.write('\t'.join([str(precisions), str(recall), str(fscore)]) + '\n')
+        fout.write('\t'.join(['Method', 'Precision', 'Recall', 'F1']) + '\n')
+        fout.write('\t'.join(['GeoBurst', str(precision), str(recall), str(fscore)]) + '\n')
