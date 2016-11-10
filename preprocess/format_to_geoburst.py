@@ -4,6 +4,7 @@ from collections import Counter
 import sys
 import random
 import operator
+import re
 
 
 def load_tweet_db(input_tweet_file):
@@ -14,8 +15,15 @@ def load_tweet_db(input_tweet_file):
 def dump_text(td, tweet_message_file):
     with open(tweet_message_file, 'w') as fout:
         for tweet in td.tweets:
-            words = tweet.message.words
-            fout.write(' '.join(words) + '\n')
+            raw_message = tweet.message.raw_message
+            clean_message = re.sub(r"http\S+", "", raw_message)
+            tokens = re.findall(r'[a-zA-Z]+', clean_message)
+            clean_tokens = []
+            for token in tokens:
+                if len(token) < 3: continue
+                clean_tokens.append(token.lower())
+            # words = tweet.message.words
+            fout.write(' '.join(clean_tokens) + '\n')
 
 
 # calc word co-occurrence info and write to file

@@ -1,5 +1,6 @@
 clean_tweet: /shared/data/czhang82/clean/ny_tweets/tweets.txt
 dir: &DIR /shared/data/czhang82/event/ny_tweets/
+plot_dir: /Users/chao/Dropbox/Research/event/results/ny/
 # inputs
 tweets: !join [*DIR, tweets.txt]
 entities: !join [*DIR, words.txt]
