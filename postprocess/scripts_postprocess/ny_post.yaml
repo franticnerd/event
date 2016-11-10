@@ -1,4 +1,5 @@
 clean_tweet: /shared/data/czhang82/clean/ny_tweets/tweets.txt
+embedding: /shared/data/czhang82/event/ny_tweets/embeddings.txt
 dir: &DIR /shared/data/czhang82/event/ny_tweets/
 # inputs
 tweets: !join [*DIR, tweets.txt]
