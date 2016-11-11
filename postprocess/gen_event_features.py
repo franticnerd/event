@@ -202,6 +202,25 @@ def get_temporal_embedding_cosine(wd, event, overall_language_model, embedding_m
 '''
 Module II. generate the description of each event.
 '''
+def gen_event_locations(td, events, event_location_file):
+    location_lists = []
+    for i, event in enumerate(events):
+        locations = get_tweet_locations(td, event)
+        location_lists.append(locations)
+    with open(event_location_file, 'w') as fout:
+        for l in location_lists:
+            fout.write(str(l) + '\n')
+
+
+def get_tweet_locations(td, event):
+    tweet_ids = event['members']
+    tweet_locations = []
+    for tweet_id in tweet_ids:
+        l = td.get_tweet(tweet_id).location
+        tweet_locations.append((l.lat, l.lng))
+    return tweet_locations
+
+
 def gen_event_descriptions(td, wd, events, event_description_file):
     descriptions = []
     for i, event in enumerate(events):
@@ -247,13 +266,14 @@ def get_top_words(event, wd, num=10):
         words.append(word)
     return {'words': ','.join(words)}
 
-def run(input_tweet_file, word_dict_file, exp_file, embedding_file, feature_file, description_file):
+def run(input_tweet_file, word_dict_file, exp_file, embedding_file, feature_file, description_file, location_file):
     td = load_tweet_database(input_tweet_file)
     td.index()
     wd = load_word_dict(word_dict_file)
     events = load_raw_exp_results(exp_file)
-    gen_event_features(td, wd, events, embedding_file, feature_file)
+    # gen_event_features(td, wd, events, embedding_file, feature_file)
     # gen_event_descriptions(td, wd, events, description_file)
+    gen_event_locations(td, events, location_file)
 
 
 if __name__ == '__main__':
@@ -271,5 +291,6 @@ if __name__ == '__main__':
     exp_file = data_dir + 'output_events.txt'
     feature_file = data_dir + 'classify_event_features.txt'
     description_file = data_dir + 'classify_event_descriptions.txt'
-    run(input_tweet_file, word_dict_file, exp_file, embedding_file, feature_file, description_file)
+    location_file = data_dir + 'classify_event_locations.txt'
+    run(input_tweet_file, word_dict_file, exp_file, embedding_file, feature_file, description_file, location_file)
 
