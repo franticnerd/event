@@ -50,8 +50,8 @@ def gen_event_features(td, wd, events, embedding_file, event_feature_file):
         feature.extend(get_spatial_variance(td, event))
         feature.append(get_spatial_tf_idf_cosine(wd, event))
         feature.append(get_temporal_tf_idf_cosine(wd, event, overall_language_model))
-        # feature.append(get_spatial_embedding_cosine(wd, event, embedding_model))
-        # feature.append(get_temporal_embedding_cosine(wd, event, overall_language_model, embedding_model))
+        feature.append(get_spatial_embedding_cosine(wd, event, embedding_model))
+        feature.append(get_temporal_embedding_cosine(wd, event, overall_language_model, embedding_model))
         features.append(feature)
     with open(event_feature_file, 'w') as fout:
         # fout.write('\t'.join(['burstiness',
@@ -71,7 +71,9 @@ def gen_event_features(td, wd, events, embedding_file, event_feature_file):
                               'lat_std',
                               'lng_std',
                               'spatial_tfidf_cos',
-                              'temporal_tfidf_cos']) + '\n')
+                              'temporal_tfidf_cos',
+                              'spatial_embed_cos',
+                              'temporal_embed_cos']) + '\n')
         for feature in features:
             fout.write('\t'.join([str(e) for e in feature]) + '\n')
 
@@ -159,10 +161,10 @@ def get_spatial_embedding_cosine(wd, event, embedding_model):
     background_words = get_top_words_from_distribution(background_distribution, wd)
     event_embedding = embedding_model.infer_vector(event_words)
     background_embedding = embedding_model.infer_vector(background_words)
-    # print 'Representative words for event and background activities.'
-    # print '\t', event_words
-    # print '\t', background_words
-    # print '\t', 1.0 - cosine(event_embedding, background_embedding)
+    print 'Representative words for event and background activities.'
+    print '\t', event_words
+    print '\t', background_words
+    print '\t', 1.0 - cosine(event_embedding, background_embedding)
     return 1.0 - cosine(event_embedding, background_embedding)
 
 

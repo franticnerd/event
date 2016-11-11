@@ -81,19 +81,19 @@ def subsample(f_train, y_train):
 
 
 def train(features, labels):
+    # Random Forest Classifier
+    model = RandomForestClassifier()
+    model.fit(features, labels)
+    print model.feature_importances_
+
     model = LogisticRegression()
     # model.fit(features, labels)
     # print feature importance
-    # rfe = RFE(model, 1)
-    # fit = rfe.fit(features, labels)
-    # # print("Num Features: %d") % fit.n_features_
-    # # print("Selected Features: %s") % fit.support_
-    # print("Feature Ranking: %s") % fit.ranking_
-
-    # Random Forest Classifier
-    # model = RandomForestClassifier()
-    # model.fit(features, labels)
-    # print model.feature_importances_
+    rfe = RFE(model, 1)
+    fit = rfe.fit(features, labels)
+    # print("Num Features: %d") % fit.n_features_
+    # print("Selected Features: %s") % fit.support_
+    print("Feature Ranking: %s") % fit.ranking_
 
     model.fit(features, labels)
     return model
