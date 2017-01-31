@@ -1,0 +1,8 @@
+raw_tweet_file: /shared/data/czhang82/raw/la_tweets/tweets.txt
+raw_entity_file: /shared/data/czhang82/raw/la_tweets/entities.txt
+
+clean_entity_file: /shared/data/czhang82/clean/la_tweets/entities.txt
+clean_tweet_file: /shared/data/czhang82/clean/la_tweets/tweets.txt
+
+word_dict_file: /shared/data/czhang82/class_event/la_tweets/tweets.txt
+entity_linked_tweet_file: /shared/data/czhang82/class_event/la_tweets/tweets.txt

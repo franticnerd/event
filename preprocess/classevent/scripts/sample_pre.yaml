@@ -1,0 +1,8 @@
+raw_tweet_file: /Users/chao/Dropbox/data/raw/sample/tweets.txt
+raw_entity_file: /Users/chao/Dropbox/data/raw/sample/entities.txt
+
+clean_entity_file: /Users/chao/Dropbox/data/clean/sample/entities.txt
+clean_tweet_file: /Users/chao/Dropbox/data/clean/sample/tweets.txt
+
+word_dict_file: /Users/chao/Dropbox/data/class_event/sample/word_dict.txt
+entity_linked_tweet_file: /Users/chao/Dropbox/data/class_event/sample/tweets.txt

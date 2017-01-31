@@ -100,7 +100,7 @@ def plot_precision(input_file, output_file):
     ax.set_xticklabels([], rotation=0)
     ax.set_ylabel('F1 Score')
     ax.get_yaxis().set_major_locator(MaxNLocator(5))
-    plt.legend(bbox_to_anchor=(1.9, 1.0), ncol=1)
+    plt.legend(bbox_to_anchor=(1.9, 1.05), ncol=1)
     plt.savefig(output_file, bbox_inches='tight', pad_inches=0.08)
 
 def load_classification_data(input_file):
@@ -122,12 +122,12 @@ def set_properties():
 
 
 if __name__ == '__main__':
-    para_file = './scripts_postprocess/ny_post.yaml' if len(sys.argv) < 2 else sys.argv[1]
+    para_file = './scripts_postprocess/la_post.yaml' if len(sys.argv) < 2 else sys.argv[1]
     para = yaml_loader().load(para_file)
     dir = para['plot_dir']
     set_properties()
     # plot_clustream_time(dir+'time_clustream.txt', dir+'time_clustream.pdf')
     # plot_clustream_time(dir+'time_embedding.txt', dir+'time_embedding.pdf')
-    plot_batch_time(dir+'time_num_tweet_ny.txt', dir+'time_num_tweet_la.txt', dir+'time_num_tweet.pdf')
+    # plot_batch_time(dir+'time_num_tweet_ny.txt', dir+'time_num_tweet_la.txt', dir+'time_num_tweet.pdf')
     # plot_online_time(dir+'time_online_update.txt', dir+'time_online_update.pdf')
-    # plot_precision(dir+'classify_event_performance.txt', dir+'classify_event_performance.pdf')
+    plot_precision(dir+'classify_event_performance.txt', dir+'classify_event_performance.pdf')
