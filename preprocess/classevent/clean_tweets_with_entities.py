@@ -43,6 +43,8 @@ def clean_linked_tweet_database(td, word_dict_file):
     emf = EmptyMessageFilter()
     td.apply_one_filter(emf)
     print 'Size after filtering frequent entities:', td.size()
+    # 4. rank the tweets in timestamp
+    td.sort_by_time()
 
 
 def write_clean_tweet_file(td, output_file):
