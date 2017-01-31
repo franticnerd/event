@@ -37,8 +37,8 @@ def clean_linked_tweet_database(td, word_dict_file):
     td.dedup()
     print 'Size after deduplication:', td.size()
     # 3. filter by word frequency
-    freq_thresh = int(td.size() * 0.1) # remove the words that are too frequent
-    infreq_thresh = 0
+    freq_thresh = int(td.size() * 0.02) # remove the words that are too frequent
+    infreq_thresh = 5
     td.trim_words_by_frequency(word_dict_file, freq_thresh, infreq_thresh)
     emf = EmptyMessageFilter()
     td.apply_one_filter(emf)

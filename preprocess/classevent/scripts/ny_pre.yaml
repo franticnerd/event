@@ -4,5 +4,5 @@ raw_entity_file: /shared/data/czhang82/raw/ny_tweets/entities.txt
 clean_entity_file: /shared/data/czhang82/clean/ny_tweets/entities.txt
 clean_tweet_file: /shared/data/czhang82/clean/ny_tweets/tweets.txt
 
-word_dict_file: /shared/data/czhang82/class_event/ny_tweets/tweets.txt
+word_dict_file: /shared/data/czhang82/class_event/ny_tweets/word_dict.txt
 entity_linked_tweet_file: /shared/data/czhang82/class_event/ny_tweets/tweets.txt
