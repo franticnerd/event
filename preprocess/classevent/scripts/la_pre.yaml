@@ -6,3 +6,5 @@ clean_tweet_file: /shared/data/czhang82/clean/la_tweets/tweets.txt
 
 word_dict_file: /shared/data/czhang82/class_event/la_tweets/word_dict.txt
 entity_linked_tweet_file: /shared/data/czhang82/class_event/la_tweets/tweets.txt
+
+clean_tweet_noun_entity: /shared/data/czhang82/class_event/la_tweets/tweet_entity_noun.txt

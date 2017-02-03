@@ -6,3 +6,5 @@ clean_tweet_file: /Users/chao/Dropbox/data/clean/sample/tweets.txt
 
 word_dict_file: /Users/chao/Dropbox/data/class_event/sample/word_dict.txt
 entity_linked_tweet_file: /Users/chao/Dropbox/data/class_event/sample/tweets.txt
+
+clean_tweet_noun_entity: /Users/chao/Dropbox/data/class_event/sample/tweet_entity_noun.txt
