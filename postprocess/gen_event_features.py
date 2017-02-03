@@ -48,10 +48,10 @@ def gen_event_features(td, wd, events, embedding_file, event_feature_file):
         # feature.extend(get_day_hour(td, event))
         feature.append(get_temporal_variance(td, event))
         feature.extend(get_spatial_variance(td, event))
-        feature.append(get_spatial_tf_idf_cosine(wd, event))
-        feature.append(get_temporal_tf_idf_cosine(wd, event, overall_language_model))
-        feature.append(get_spatial_embedding_cosine(wd, event, embedding_model))
-        feature.append(get_temporal_embedding_cosine(wd, event, overall_language_model, embedding_model))
+        # feature.append(get_spatial_tf_idf_cosine(wd, event))
+        # feature.append(get_temporal_tf_idf_cosine(wd, event, overall_language_model))
+        # feature.append(get_spatial_embedding_cosine(wd, event, embedding_model))
+        # feature.append(get_temporal_embedding_cosine(wd, event, overall_language_model, embedding_model))
         features.append(feature)
     with open(event_feature_file, 'w') as fout:
         # fout.write('\t'.join(['burstiness',
@@ -70,10 +70,11 @@ def gen_event_features(td, wd, events, embedding_file, event_feature_file):
                               'time_std',
                               'lat_std',
                               'lng_std',
-                              'spatial_tfidf_cos',
-                              'temporal_tfidf_cos',
-                              'spatial_embed_cos',
-                              'temporal_embed_cos']) + '\n')
+                              # 'spatial_tfidf_cos',
+                              # 'temporal_tfidf_cos',
+                              # 'spatial_embed_cos',
+                              # 'temporal_embed_cos'
+                              ]) + '\n')
         for feature in features:
             fout.write('\t'.join([str(e) for e in feature]) + '\n')
 
@@ -271,9 +272,9 @@ def run(input_tweet_file, word_dict_file, exp_file, embedding_file, feature_file
     td.index()
     wd = load_word_dict(word_dict_file)
     events = load_raw_exp_results(exp_file)
-    # gen_event_features(td, wd, events, embedding_file, feature_file)
+    gen_event_features(td, wd, events, embedding_file, feature_file)
     # gen_event_descriptions(td, wd, events, description_file)
-    gen_event_locations(td, events, location_file)
+    # gen_event_locations(td, events, location_file)
 
 
 if __name__ == '__main__':

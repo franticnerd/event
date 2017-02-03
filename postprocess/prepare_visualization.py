@@ -52,10 +52,10 @@ def split_events(description_file, location_file, label_file,
         event_description = descriptions[event_id]
         if label == 1:
             fout_true_des.write(event_description + '\n')
-            fout_true_loc.write(event_location_str + '\n')
+            fout_true_loc.write(str(event_id) + ': ' + event_location_str + '\n')
         else:
             fout_false_des.write(event_description + '\n')
-            fout_false_loc.write(event_location_str + '\n')
+            fout_false_loc.write(str(event_id) + ': ' + event_location_str + '\n')
     fout_true_des.close()
     fout_true_loc.close()
     fout_true_des.close()
