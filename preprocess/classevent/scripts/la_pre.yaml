@@ -1,10 +1,12 @@
-raw_tweet_file: /shared/data/czhang82/raw/la_tweets/tweets.txt
-raw_entity_file: /shared/data/czhang82/raw/la_tweets/entities.txt
+# raw_tweet_file: /shared/data/czhang82/raw/la_tweets/tweets.txt
+# raw_entity_file: /shared/data/czhang82/raw/la_tweets/entities.txt
 
 clean_entity_file: /shared/data/czhang82/clean/la_tweets/entities.txt
-clean_tweet_file: /shared/data/czhang82/clean/la_tweets/tweets.txt
+clean_tweet_file: /shared/data/czhang82/clean/la_tweets_noun/tweets.txt
 
-word_dict_file: /shared/data/czhang82/class_event/la_tweets/word_dict.txt
+# replace the fields with entities
+# word_dict_file: /shared/data/czhang82/class_event/la_tweets/word_dict.txt
 entity_linked_tweet_file: /shared/data/czhang82/class_event/la_tweets/tweets.txt
 
-clean_tweet_noun_entity: /shared/data/czhang82/class_event/la_tweets/tweet_entity_noun.txt
+clean_tweet_noun_entity: /shared/data/czhang82/class_event/la_tweets/noun_entity/tweets.txt
+clean_tweet_noun: /shared/data/czhang82/class_event/la_tweets/noun/tweets.txt
